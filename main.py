@@ -8,6 +8,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
 from utils.logger import log
+from utils.url_helper import normalize_url
 from config.settings import settings
 
 # 根据配置决定是否应用 Autogen 兼容性补丁
@@ -31,6 +32,9 @@ from tools.browser_tools import (
     get_page_content,
     execute_javascript,
     wait_for_element,
+    find_forms,
+    find_links,
+    analyze_page_structure,
     close_browser
 )
 from tools.web_scanner import (
@@ -70,6 +74,8 @@ async def run_web_scan(target_url: str):
     Args:
         target_url: 目标 URL
     """
+    # 规范化 URL
+    target_url = normalize_url(target_url)
     log.info(f"开始扫描目标: {target_url}")
 
     # 创建扫描 Agent，并提供工具
@@ -151,6 +157,8 @@ async def run_vulnerability_test(target_url: str):
     Args:
         target_url: 目标 URL
     """
+    # 规范化 URL
+    target_url = normalize_url(target_url)
     log.info(f"开始漏洞测试: {target_url}")
 
     # 创建漏洞分析 Agent
@@ -228,6 +236,8 @@ async def run_browser_automation(target_url: str):
     Args:
         target_url: 目标 URL
     """
+    # 规范化 URL
+    target_url = normalize_url(target_url)
     log.info(f"开始浏览器自动化测试: {target_url}")
 
     # 创建浏览器自动化 Agent
@@ -239,24 +249,51 @@ async def run_browser_automation(target_url: str):
         get_page_content,
         execute_javascript,
         wait_for_element,
+        find_forms,
+        find_links,
+        analyze_page_structure,
     ]
 
     browser_agent = BrowserAutomationAgent(tools=browser_tools)
 
     task = f"""
-    请使用浏览器自动化工具测试 {target_url}：
+    请使用浏览器自动化工具对 {target_url} 进行完整的安全测试，必须完成以下所有步骤：
 
-    1. 访问目标网站
-    2. 截取首页截图
-    3. 分析页面结构
-    4. 查找登录表单
-    5. 测试表单输入
+    第一步：访问和初步分析
+    1.1 使用 navigate_to_url 工具访问目标网站
+    1.2 使用 take_screenshot 工具截取首页截图
+    1.3 使用 analyze_page_structure 工具分析页面整体结构
 
-    请详细记录每一步操作。
+    第二步：深入分析页面元素
+    2.1 使用 find_forms 工具查找所有表单
+    2.2 使用 find_links 工具查找所有链接
+    2.3 使用 get_page_content 工具获取完整的 HTML 内容（仅获取前 2000 字符）
+
+    第三步：表单安全测试（如果存在表单）
+    3.1 对找到的表单进行 XSS 测试（尝试输入 <script>alert('XSS')</script>）
+    3.2 对找到的表单进行 SQL 注入测试（尝试输入 ' OR '1'='1）
+    3.3 测试表单验证机制
+
+    第四步：JavaScript 安全检测
+    4.1 使用 execute_javascript 检查是否存在敏感信息泄露
+    4.2 检查 Cookie 安全设置
+    4.3 检查是否存在不安全的第三方脚本
+
+    第五步：生成测试报告
+    5.1 总结发现的所有安全问题
+    5.2 列出测试过的功能点
+    5.3 提供安全建议
+
+    重要提示：
+    - 必须按顺序完成所有步骤，不要跳过任何一步
+    - 每一步都要实际调用相应的工具函数
+    - 详细记录每个工具调用的结果
+    - 如果某个工具调用失败，记录错误信息并继续下一步
+    - 最后必须提供完整的测试总结报告
     """
 
     try:
-        result = await browser_agent.run(task)
+        result = await browser_agent.run(task, max_turns=30)
         console.print("\n[green]浏览器自动化测试完成[/green]")
 
         # 提取测试结果文本

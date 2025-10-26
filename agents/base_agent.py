@@ -4,6 +4,8 @@
 from typing import Optional, List, Callable, Any, Dict
 
 from autogen_agentchat.agents import AssistantAgent
+from autogen_agentchat.teams import RoundRobinGroupChat
+from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from config.settings import settings
 from utils.logger import log
@@ -60,18 +62,33 @@ class BaseSecurityAgent:
         
         log.info(f"Agent '{self.name}' 初始化成功")
     
-    async def run(self, task: str) -> Any:
+    async def run(self, task: str, max_turns: int = 30) -> Any:
         """
         运行任务
-        
+
         Args:
             task: 任务描述
-            
+            max_turns: 最大消息数,默认 30 条消息
+
         Returns:
             任务结果
         """
         log.info(f"Agent '{self.name}' 开始执行任务: {task}")
-        result = await self.agent.run(task=task)
+
+        # 使用 RoundRobinGroupChat 来控制对话轮次
+        # 创建一个只包含当前 agent 的团队
+        # 组合两个终止条件: 达到最大消息数 或 检测到 TERMINATE 关键词
+        max_msg_termination = MaxMessageTermination(max_messages=max_turns)
+        text_termination = TextMentionTermination("TERMINATE")
+
+        # 使用 OR 逻辑: 任一条件满足即终止
+        termination = max_msg_termination | text_termination
+
+        team = RoundRobinGroupChat([self.agent], termination_condition=termination)
+
+        # 运行任务
+        result = await team.run(task=task)
+
         log.info(f"Agent '{self.name}' 任务执行完成")
         return result
     

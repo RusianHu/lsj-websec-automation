@@ -8,6 +8,7 @@ import asyncio
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 from utils.logger import log
+from utils.url_helper import normalize_url
 
 
 async def scan_directory(
@@ -19,27 +20,30 @@ async def scan_directory(
 ) -> Dict[str, Any]:
     """
     目录扫描
-    
+
     Args:
         base_url: 基础 URL
         wordlist: 字典列表
         extensions: 文件扩展名列表
         status_codes: 要匹配的状态码列表
         timeout: 请求超时时间
-        
+
     Returns:
         扫描结果
     """
+    # 规范化 URL
+    base_url = normalize_url(base_url)
+
     if status_codes is None:
         status_codes = [200, 201, 204, 301, 302, 307, 401, 403]
-    
+
     if extensions is None:
         extensions = ["", ".php", ".html", ".asp", ".aspx", ".jsp"]
-    
+
     results = []
     total = len(wordlist) * len(extensions)
     scanned = 0
-    
+
     log.info(f"开始目录扫描: {base_url}")
     log.info(f"字典大小: {len(wordlist)}, 扩展名: {extensions}")
     
@@ -153,21 +157,24 @@ async def fuzz_parameters(
 ) -> Dict[str, Any]:
     """
     参数模糊测试
-    
+
     Args:
         url: 目标 URL
         param_name: 参数名称
         wordlist: 测试值列表
         method: HTTP 方法
         timeout: 请求超时时间
-        
+
     Returns:
         测试结果
     """
+    # 规范化 URL
+    url = normalize_url(url)
+
     results = []
     total = len(wordlist)
     tested = 0
-    
+
     log.info(f"开始参数模糊测试: {url}?{param_name}=FUZZ")
     
     async with httpx.AsyncClient(timeout=timeout, follow_redirects=False) as client:
@@ -213,13 +220,16 @@ async def fuzz_parameters(
 async def check_common_files(base_url: str) -> Dict[str, Any]:
     """
     检查常见敏感文件
-    
+
     Args:
         base_url: 基础 URL
-        
+
     Returns:
         检查结果
     """
+    # 规范化 URL
+    base_url = normalize_url(base_url)
+
     common_files = [
         "robots.txt",
         "sitemap.xml",
@@ -238,9 +248,9 @@ async def check_common_files(base_url: str) -> Dict[str, Any]:
         "composer.json",
         "package.json",
     ]
-    
+
     results = []
-    
+
     log.info(f"检查常见敏感文件: {base_url}")
     
     async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
