@@ -1,9 +1,10 @@
 # LSJ WebSec Automation
-
 <div align="center">
 
 **基于 Autogen + Playwright 的智能化自动化渗透测试工具**
 
+[![Stargazers](https://img.shields.io/github/stars/RusianHu/lsj-websec-automation?style=social)](https://github.com/RusianHu/lsj-websec-automation/stargazers)
+[![Forks](https://img.shields.io/github/forks/RusianHu/lsj-websec-automation?style=social)](https://github.com/RusianHu/lsj-websec-automation/network/members)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/)
 [![Autogen](https://img.shields.io/badge/Autogen-0.4.0+-orange.svg)](https://github.com/microsoft/autogen)
@@ -149,11 +150,6 @@ python main.py
 3. **浏览器自动化测试** - 表单测试、JavaScript 安全检测、Cookie 分析
 4. **完整测试** - 执行以上所有测试
 
-**特点：**
-- ✅ LLM 自主决策工具调用顺序
-- ✅ 自动分析测试结果并调整策略
-- ✅ 生成详细的 HTML + JSON 报告
-
 ### 模式二：普通交互式测试模式
 
 运行 `interactive_test.py`，手动选择测试项目：
@@ -174,21 +170,7 @@ python interactive_test.py
 8. 全面扫描（所有测试）
 9. 生成测试报告
 
-## 📊 测试报告示例
-
-### HTML 报告特性
-
--  **响应式设计**：支持桌面和移动设备
--  **可视化图表**：漏洞分布、风险等级统计
--  **详细证据**：包含截图、请求/响应数据
--  **修复建议**：针对每个漏洞提供修复方案
--  **时间线**：完整的测试过程记录
-
-### JSON 报告特性
-
--  **结构化数据**：易于解析和集成
--  **完整信息**：包含所有测试细节
--  **可扩展性**：支持自定义字段
+## 📊 测试报告
 
 报告文件位置：`output/reports/`
 
@@ -244,32 +226,7 @@ BROWSER_TIMEOUT=30000
 # 在 config/settings.py 中配置 slow_mo
 ```
 
----
 
-## 🛡️ 安全与合规
-
-### ⚠️ 重要声明
-
-**本工具仅供授权的安全测试使用！**
-
-- ✅ **合法使用**：仅在获得明确授权的系统上使用
-- ❌ **禁止滥用**：未经授权的渗透测试是违法行为
-- 📜 **遵守法律**：使用者需遵守所在地区的法律法规
-- 🔒 **数据保护**：妥善保管测试报告，避免敏感信息泄露
-
-### 最佳实践
-
-1. **获取授权**：始终获得书面授权后再进行测试
-2. **限制范围**：严格限制在授权的测试范围内
-3. **速率控制**：合理设置请求速率，避免影响目标系统
-4. **数据备份**：测试前确保目标系统有完整备份
-5. **报告保密**：测试报告应加密存储，仅授权人员可访问
-
----
-
-## 📝 许可证
-
-本项目采用 [Apache License 2.0](LICENSE) 许可证。
 
 ---
 
@@ -287,6 +244,11 @@ BROWSER_TIMEOUT=30000
 
 ## 📧 联系方式
 
-- **项目主页**：[GitHub Repository](https://github.com/yourusername/lsj-websec-automation)
-- **问题反馈**：[Issues](https://github.com/yourusername/lsj-websec-automation/issues)
-- **讨论交流**：[Discussions](https://github.com/yourusername/lsj-websec-automation/discussions)
+- **如果需要更多自动化安全测试工具请联系**：
+- yanshanlaosiji@gmail.com
+
+---
+
+## 📝 许可证
+
+本项目采用 [Apache License 2.0](LICENSE) 许可证。
