@@ -62,18 +62,23 @@ class BaseSecurityAgent:
         
         log.info(f"Agent '{self.name}' 初始化成功")
     
-    async def run(self, task: str, max_turns: int = 30) -> Any:
+    async def run(self, task: str, max_turns: Optional[int] = None) -> Any:
         """
         运行任务
 
         Args:
             task: 任务描述
-            max_turns: 最大消息数,默认 30 条消息
+            max_turns: 最大消息数，如果为 None 则使用配置文件中的值
 
         Returns:
             任务结果
         """
+        # 如果未指定 max_turns，使用配置文件中的值
+        if max_turns is None:
+            max_turns = settings.app.autogen_max_turns
+
         log.info(f"Agent '{self.name}' 开始执行任务: {task}")
+        log.info(f"最大轮数设置: {max_turns}")
 
         # 使用 RoundRobinGroupChat 来控制对话轮次
         # 创建一个只包含当前 agent 的团队

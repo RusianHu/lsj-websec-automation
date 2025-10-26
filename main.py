@@ -293,7 +293,7 @@ async def run_browser_automation(target_url: str):
     """
 
     try:
-        result = await browser_agent.run(task, max_turns=30)
+        result = await browser_agent.run(task)
         console.print("\n[green]浏览器自动化测试完成[/green]")
 
         # 提取测试结果文本

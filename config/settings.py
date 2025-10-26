@@ -101,6 +101,50 @@ class ProxyConfig(BaseModel):
     https_proxy: Optional[str] = Field(default_factory=lambda: os.getenv("HTTPS_PROXY"))
 
 
+class ScannerConfig(BaseModel):
+    """扫描器配置"""
+    # 目录扫描配置
+    auto_calibrate: bool = Field(
+        default_factory=lambda: os.getenv("SCANNER_AUTO_CALIBRATE", "true").lower() == "true"
+    )
+    rate_limit: int = Field(
+        default_factory=lambda: int(os.getenv("SCANNER_RATE_LIMIT", "40"))
+    )
+    recursion_depth: int = Field(
+        default_factory=lambda: int(os.getenv("SCANNER_RECURSION_DEPTH", "0"))
+    )
+    request_timeout: int = Field(
+        default_factory=lambda: int(os.getenv("SCANNER_TIMEOUT", "10"))
+    )
+
+    # API 测试配置
+    api_test_methods: bool = Field(
+        default_factory=lambda: os.getenv("API_TEST_METHODS", "true").lower() == "true"
+    )
+    api_test_auth: bool = Field(
+        default_factory=lambda: os.getenv("API_TEST_AUTH", "true").lower() == "true"
+    )
+    api_test_rate_limit: bool = Field(
+        default_factory=lambda: os.getenv("API_TEST_RATE_LIMIT", "true").lower() == "true"
+    )
+
+    # 认证测试配置
+    test_auth_bypass: bool = Field(
+        default_factory=lambda: os.getenv("TEST_AUTH_BYPASS", "true").lower() == "true"
+    )
+    test_idor: bool = Field(
+        default_factory=lambda: os.getenv("TEST_IDOR", "true").lower() == "true"
+    )
+    idor_id_range: int = Field(
+        default_factory=lambda: int(os.getenv("IDOR_ID_RANGE", "100"))
+    )
+
+    # 文件扩展名
+    file_extensions: list = Field(
+        default_factory=lambda: [".php", ".html", ".asp", ".aspx", ".jsp", ".txt", ".bak", ".old"]
+    )
+
+
 class AppConfig(BaseModel):
     """应用配置"""
     log_level: str = Field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
@@ -110,6 +154,9 @@ class AppConfig(BaseModel):
     reports_dir: Path = BASE_DIR / "output" / "reports"
     enable_autogen_patch: bool = Field(
         default_factory=lambda: os.getenv("ENABLE_AUTOGEN_PATCH", "false").lower() == "true"
+    )
+    autogen_max_turns: int = Field(
+        default_factory=lambda: int(os.getenv("AUTOGEN_MAX_TURNS", "30"))
     )
 
     def __init__(self, **data):
@@ -126,6 +173,7 @@ class Settings(BaseModel):
     llm: LLMConfig = Field(default_factory=LLMConfig)
     playwright: PlaywrightConfig = Field(default_factory=PlaywrightConfig)
     proxy: ProxyConfig = Field(default_factory=ProxyConfig)
+    scanner: ScannerConfig = Field(default_factory=ScannerConfig)
     app: AppConfig = Field(default_factory=AppConfig)
 
 
