@@ -19,7 +19,7 @@
 LSJ WebSec Automation 自动化渗透测试工具，结合了 **Microsoft Autogen** 的 AI Agent 编排能力和 **Playwright** 的浏览器自动化技术，进行自动化渗透测试。
 
 
-## 🏗️ 系统架构
+## 🏗️ 逻辑架构
 
 ### 工作流程图
 
