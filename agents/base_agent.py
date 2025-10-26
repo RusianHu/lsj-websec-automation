@@ -84,7 +84,8 @@ class BaseSecurityAgent:
         # 创建一个只包含当前 agent 的团队
         # 组合两个终止条件: 达到最大消息数 或 检测到 TERMINATE 关键词
         max_msg_termination = MaxMessageTermination(max_messages=max_turns)
-        text_termination = TextMentionTermination("TERMINATE")
+        # 仅当来自当前 Assistant 的消息包含 TERMINATE 时才触发终止，避免用户任务/系统提示中的术语误触发
+        text_termination = TextMentionTermination("TERMINATE", sources=[self.name])
 
         # 使用 OR 逻辑: 任一条件满足即终止
         termination = max_msg_termination | text_termination
