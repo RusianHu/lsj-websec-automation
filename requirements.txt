@@ -1,0 +1,25 @@
+# AutoGen 核心依赖
+autogen-agentchat>=0.4.0
+autogen-core>=0.4.0
+autogen-ext[openai]>=0.4.0
+
+# Playwright 浏览器自动化
+playwright>=1.40.0
+
+# Web 请求和工具
+requests>=2.31.0
+httpx>=0.25.0
+aiohttp>=3.9.0
+
+# 数据处理
+pyyaml>=6.0
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+
+# 日志和调试
+loguru>=0.7.0
+rich>=13.7.0
+
+# 异步支持
+asyncio>=3.4.3
+
