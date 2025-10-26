@@ -20,64 +20,6 @@ LSJ WebSec Automation 自动化渗透测试工具，结合了 **Microsoft Autoge
 
 ## 🏗️ 系统架构
 
-### 整体架构图
-
-```mermaid
-graph TB
-    subgraph "用户交互层"
-        A[main.py<br/>AI 自动化模式] 
-        B[interactive_test.py<br/>交互式测试模式]
-    end
-    
-    subgraph "AI Agent 层"
-        C[WebScannerAgent<br/>Web 扫描专家]
-        D[VulnerabilityAnalystAgent<br/>漏洞分析专家]
-        E[BrowserAutomationAgent<br/>浏览器自动化专家]
-        F[ReportGeneratorAgent<br/>报告生成专家]
-    end
-    
-    subgraph "LLM 服务层"
-        G[OpenAI Compatible API<br/>Gemini/GPT-4/etc]
-    end
-    
-    subgraph "工具函数层"
-        H[Browser Tools<br/>浏览器操作]
-        I[Web Scanner<br/>目录/文件扫描]
-        J[Vulnerability Scanner<br/>漏洞检测]
-        K[Advanced Scanner<br/>高级模糊测试]
-        L[Auth Scanner<br/>认证测试]
-        M[API Scanner<br/>API 安全测试]
-    end
-    
-    subgraph "基础设施层"
-        N[Playwright<br/>浏览器引擎]
-        O[HTTPX/Requests<br/>HTTP 客户端]
-        P[Configuration<br/>配置管理]
-    end
-    
-    subgraph "输出层"
-        Q[HTML Report<br/>可视化报告]
-        R[JSON Report<br/>结构化数据]
-        S[Screenshots<br/>截图证据]
-        T[Logs<br/>详细日志]
-    end
-    
-    A --> C & D & E & F
-    B --> H & I & J
-    C & D & E & F --> G
-    C & D & E & F --> H & I & J & K & L & M
-    H --> N
-    I & J & K & L & M --> O
-    A & B --> P
-    C & D & E & F --> Q & R & S & T
-    B --> Q & R & S & T
-    
-    style A fill:#4CAF50
-    style B fill:#2196F3
-    style G fill:#FF9800
-    style Q fill:#E91E63
-```
-
 ### 工作流程图
 
 ```mermaid
@@ -232,121 +174,21 @@ python interactive_test.py
 8. 全面扫描（所有测试）
 9. 生成测试报告
 
-
-## 🔧 核心功能详解
-
-### 1. AI Agent 智能编排
-
-项目使用 Microsoft Autogen 框架实现了四种专业 Agent：
-
-#### WebScannerAgent（Web 扫描专家）
-- 🎯 目录模糊测试（基于 ffuf 策略）
-- 📁 敏感文件检测（.git、.env、备份文件等）
-- 🔍 参数发现与模糊测试
-- 🌐 子域名枚举
-- 📊 自动校准过滤误报
-
-#### VulnerabilityAnalystAgent（漏洞分析专家）
-- 💉 SQL 注入检测（基于错误、布尔、时间盲注）
-- 🔓 XSS 跨站脚本测试（反射型、存储型、DOM 型）
-- 📂 本地文件包含（LFI）测试
-- 🔀 开放重定向漏洞检测
-- 🔐 认证绕过测试
-- 🆔 IDOR（不安全的直接对象引用）测试
-- 🔑 会话管理安全测试
-- ⬆️ 权限提升漏洞检测
-
-#### BrowserAutomationAgent（浏览器自动化专家）
-- 🎭 真实浏览器模拟（Chromium/Firefox/WebKit）
-- 📝 表单自动填充与提交
-- 🖱️ 元素点击与交互
-- 📸 自动截图取证
-- 🔍 页面结构分析
-- 🍪 Cookie 安全检测
-- 📜 JavaScript 执行与分析
-
-#### ReportGeneratorAgent（报告生成专家）
-- 📄 生成详细的 HTML 可视化报告
-- 📊 生成结构化 JSON 数据报告
-- 🎨 美观的报告样式（响应式设计）
-- 📈 漏洞统计与风险评级
-- 💡 修复建议与最佳实践
-
-### 2. 高级扫描功能
-
-#### 目录模糊测试
-```python
-# 支持递归扫描、自动校准、速率限制
-await fuzzing_directory_advanced(
-    base_url="https://example.com",
-    wordlist=["admin", "api", "backup"],
-    extensions=[".php", ".html", ".bak"],
-    recursion_depth=2,
-    auto_calibrate=True,
-    rate_limit=40
-)
-```
-
-#### API 安全测试
-```python
-# API 端点发现、认证测试、速率限制测试
-await discover_api_endpoints(base_url="https://api.example.com")
-await test_api_authentication(api_url, endpoints)
-await test_api_rate_limiting(api_url)
-await test_graphql_introspection(graphql_url)
-```
-
-#### 认证与授权测试
-```python
-# 认证绕过、IDOR、会话管理、权限提升
-await test_authentication_bypass(login_url, protected_url)
-await test_idor_vulnerability(base_url, id_parameter, range(1, 100))
-await test_session_management(login_url, credentials)
-await test_privilege_escalation(base_url, user_token, admin_endpoint)
-```
-
-### 3. 浏览器自动化
-
-基于 Playwright 实现的真实浏览器操作：
-
-```python
-# 导航到目标网站
-await navigate_to_url("https://example.com")
-
-# 查找并填充表单
-forms = await find_forms()
-await fill_form({"username": "test", "password": "test123"})
-
-# 点击按钮
-await click_element("button[type='submit']")
-
-# 截图取证
-await take_screenshot("login_page")
-
-# 执行 JavaScript
-result = await execute_javascript("return document.cookie")
-
-# 分析页面结构
-structure = await analyze_page_structure()
-```
-
----
-
 ## 📊 测试报告示例
 
 ### HTML 报告特性
 
-- ✅ **响应式设计**：支持桌面和移动设备
-- ✅ **可视化图表**：漏洞分布、风险等级统计
-- ✅ **详细证据**：包含截图、请求/响应数据
-- ✅ **修复建议**：针对每个漏洞提供修复方案
-- ✅ **时间线**：完整的测试过程记录
+-  **响应式设计**：支持桌面和移动设备
+-  **可视化图表**：漏洞分布、风险等级统计
+-  **详细证据**：包含截图、请求/响应数据
+-  **修复建议**：针对每个漏洞提供修复方案
+-  **时间线**：完整的测试过程记录
 
 ### JSON 报告特性
 
-- ✅ **结构化数据**：易于解析和集成
-- ✅ **完整信息**：包含所有测试细节
-- ✅ **可扩展性**：支持自定义字段
+-  **结构化数据**：易于解析和集成
+-  **完整信息**：包含所有测试细节
+-  **可扩展性**：支持自定义字段
 
 报告文件位置：`output/reports/`
 
