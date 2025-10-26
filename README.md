@@ -72,7 +72,7 @@ sequenceDiagram
 1. **克隆项目**
 
 ```bash
-git clone https://github.com/yourusername/lsj-websec-automation.git
+git clone https://github.com/RusianHu/lsj-websec-automation.git
 cd lsj-websec-automation
 ```
 
