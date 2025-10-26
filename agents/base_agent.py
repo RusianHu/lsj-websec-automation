@@ -57,7 +57,7 @@ class BaseSecurityAgent:
             system_message=self.system_message,
             model_client=self.model_client,
             tools=self.tools,
-            reflect_on_tool_use=True,
+            reflect_on_tool_use=settings.app.autogen_reflect_on_tool_use,
         )
         
         log.info(f"Agent '{self.name}' 初始化成功")

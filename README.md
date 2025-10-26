@@ -18,7 +18,6 @@
 
 LSJ WebSec Automation 自动化渗透测试工具，结合了 **Microsoft Autogen** 的 AI Agent 编排能力和 **Playwright** 的浏览器自动化技术，进行自动化渗透测试。
 
-
 ## 🏗️ 逻辑架构
 
 ### 工作流程图
@@ -58,6 +57,133 @@ sequenceDiagram
 ```
 
 ---
+
+<details>
+<summary>执行示例 </summary>
+
+```bash
+PS C:\Users\admin\Desktop\porg\lsj-websec-automation> .\venv\Scripts\python.exe .\main.py
+2025-10-27 00:24:27 | INFO     | utils.patch_autogen:apply_patch:152 - 正在应用 Autogen 兼容性补丁...
+2025-10-27 00:24:27 | INFO     | utils.patch_autogen:apply_patch:164 - ✅ Autogen 兼容性补丁已应用
+2025-10-27 00:24:27 | INFO     | __main__:<module>:18 - Autogen 兼容性补丁已启用(用于修复某些 OpenAI 兼容服务器的 additionalProperties 字段问题)
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                                                                                                             │
+│ ╔═══════════════════════════════════════════════════════════╗                                                                                                                                               │
+│ ║                                                           ║                                                                                                                                               │
+│ ║        LSJ WebSec Automation                              ║                                                                                                                                               │
+│ ║        基于 Autogen + Playwright 的自动化渗透测试工具      ║                                                                                                                                              │
+│ ║                                                           ║                                                                                                                                               │
+│ ╚═══════════════════════════════════════════════════════════╝                                                                                                                                               │
+│                                                                                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+欢迎使用 LSJ WebSec Automation!
+
+
+请选择操作:
+1. Web 扫描
+2. 漏洞测试
+3. 浏览器自动化测试
+4. 完整测试（包含以上所有）
+5. 退出
+
+请输入选项 [1/2/3/4/5] (1): 3
+
+请输入目标 URL (http://testphp.vulnweb.com): yanshanlaosiji.top
+2025-10-27 00:24:36 | INFO     | __main__:run_browser_automation:299 - 开始浏览器自动化测试: https://yanshanlaosiji.top
+2025-10-27 00:24:36 | INFO     | agents.base_agent:__init__:63 - Agent 'BrowserAutomation' 初始化成功
+2025-10-27 00:24:36 | INFO     | agents.base_agent:run:80 - Agent 'BrowserAutomation' 开始执行任务:
+    请使用浏览器自动化工具对 https://yanshanlaosiji.top 进行完整的安全测试，必须完成以下所有步骤：
+
+    第一步：访问和初步分析
+    1.1 使用 navigate_to_url 工具访问目标网站
+    1.2 使用 take_screenshot 工具截取首页截图
+    1.3 使用 analyze_page_structure 工具分析页面整体结构
+    1.4 使用 analyze_security_headers 工具检查 HTTP 安全响应头
+
+    第二步：深入分析页面元素
+    2.1 使用 find_forms 工具查找所有表单
+    2.2 使用 find_links 工具查找所有链接
+    2.3 使用 get_page_content 工具获取完整的 HTML 内容（仅获取前 2000 字符）
+
+    第三步：表单安全测试（如果存在表单）
+    3.1 使用 clear_event_caches 清空事件缓存
+    3.2 使用 test_form_with_payloads 批量测试 XSS payload:
+        - <script>alert('XSS')</script>
+        - <img src=x onerror=alert('XSS')>
+        - "><script>alert('XSS')</script>
+    3.3 使用 get_dialog_events 检查是否触发了 alert (XSS 证据)
+    3.4 使用 get_console_logs 检查控制台错误
+    3.5 使用 get_js_errors 检查 JavaScript 运行时错误
+
+    第四步：网络和 JavaScript 安全检测
+    4.1 使用 get_network_events 获取网络请求和响应
+    4.2 使用 execute_javascript 检查是否存在敏感信息泄露
+    4.3 检查 Cookie 安全设置
+    4.4 检查是否存在不安全的第三方脚本
+
+    第五步：生成测试报告
+    5.1 总结发现的所有安全问题（包括 XSS、安全头缺失、JS 错误等）
+    5.2 列出测试过的功能点
+    5.3 提供安全建议
+    5.4 在报告末尾添加 "TERMINATE" 表示完成
+
+    重要提示：
+    - 必须按顺序完成所有步骤，不要跳过任何一步
+    - 每一步都要实际调用相应的工具函数
+    - 使用新的观测工具收集安全证据（console logs, dialogs, network events）
+    - 详细记录每个工具调用的结果
+    - 如果某个工具调用失败，记录错误信息并继续下一步
+    - 最后必须提供完整的测试总结报告并说 "TERMINATE"
+    
+2025-10-27 00:24:36 | INFO     | agents.base_agent:run:81 - 最大轮数设置: 20
+C:\Users\admin\Desktop\porg\lsj-websec-automation\venv\lib\site-packages\autogen_agentchat\agents\_assistant_agent.py:1109: UserWarning: Finish reason mismatch: stop != tool_calls when tool_calls are present. Finish reason may not be accurate. This may be due to the API used that is not returning the correct finish reason.
+  model_result = await model_client.create(
+2025-10-27 00:24:48 | INFO     | utils.browser:start:32 - 正在启动浏览器...
+2025-10-27 00:24:49 | INFO     | utils.browser:_setup_event_listeners:251 - 事件监听器已设置
+2025-10-27 00:24:49 | INFO     | utils.browser:start:73 - 浏览器启动成功
+2025-10-27 00:24:49 | INFO     | utils.browser:goto:107 - 导航到: https://yanshanlaosiji.top
+2025-10-27 00:24:52 | INFO     | tools.browser_tools:navigate_to_url:48 - 成功导航到: https://yanshanlaosiji.top
+2025-10-27 00:24:54 | INFO     | tools.browser_tools:take_screenshot:85 - 截图已保存: C:\Users\admin\Desktop\porg\lsj-websec-automation\output\screenshots\homepage_screenshot.png
+2025-10-27 00:24:57 | INFO     | tools.browser_tools:analyze_page_structure:387 - 页面结构分析完成
+2025-10-27 00:24:58 | INFO     | tools.browser_tools:analyze_security_headers:635 - 安全头分析完成, 缺失 3 个安全头
+2025-10-27 00:24:59 | INFO     | tools.browser_tools:find_forms:295 - 找到 0 个表单
+2025-10-27 00:25:01 | INFO     | tools.browser_tools:find_links:335 - 找到 16 个链接
+2025-10-27 00:25:08 | INFO     | utils.browser:clear_event_caches:267 - 事件缓存已清空
+2025-10-27 00:25:08 | INFO     | tools.browser_tools:clear_event_caches:601 - 事件缓存已清空
+2025-10-27 00:25:09 | INFO     | tools.browser_tools:get_dialog_events:524 - 获取到 0 个对话框事件
+2025-10-27 00:25:10 | INFO     | tools.browser_tools:get_console_logs:454 - 获取到 0 条控制台日志
+2025-10-27 00:25:13 | INFO     | tools.browser_tools:get_js_errors:486 - 获取到 0 个 JavaScript 错误
+2025-10-27 00:25:15 | INFO     | tools.browser_tools:get_network_events:570 - 获取到 0 个请求, 0 个响应
+2025-10-27 00:25:22 | ERROR    | tools.browser_tools:execute_javascript:221 - 执行 JavaScript 失败: Page.evaluate: SyntaxError: Illegal return statement
+    at eval (<anonymous>)
+    at UtilityScript.evaluate (<anonymous>:291:30)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+2025-10-27 00:25:27 | INFO     | tools.browser_tools:execute_javascript:213 - 成功执行 JavaScript
+2025-10-27 00:25:31 | ERROR    | tools.browser_tools:execute_javascript:221 - 执行 JavaScript 失败: Page.evaluate: SyntaxError: Illegal return statement
+    at eval (<anonymous>)
+    at UtilityScript.evaluate (<anonymous>:291:30)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+2025-10-27 00:25:31 | INFO     | agents.base_agent:run:98 - Agent 'BrowserAutomation' 任务执行完成
+
+浏览器自动化测试完成
+
+正在生成报告...
+2025-10-27 00:25:31 | INFO     | tools.report_generator:generate_html_report:190 - HTML 报告已生成: C:\Users\admin\Desktop\porg\lsj-websec-automation\output\reports\browser_test_20251027_002531.html
+2025-10-27 00:25:31 | INFO     | tools.report_generator:generate_json_report:279 - JSON 报告已生成: C:\Users\admin\Desktop\porg\lsj-websec-automation\output\reports\browser_test_20251027_002531.json
+
+✅ 报告已生成:
+  HTML: C:\Users\admin\Desktop\porg\lsj-websec-automation\output\reports\browser_test_20251027_002531.html
+  JSON: C:\Users\admin\Desktop\porg\lsj-websec-automation\output\reports\browser_test_20251027_002531.json
+2025-10-27 00:25:31 | INFO     | agents.base_agent:close:105 - Agent 'BrowserAutomation' 已关闭
+2025-10-27 00:25:31 | INFO     | utils.browser:close:78 - 正在关闭浏览器...
+2025-10-27 00:25:31 | INFO     | utils.browser:close:89 - 浏览器已关闭
+2025-10-27 00:25:31 | INFO     | tools.browser_tools:close_browser:416 - 浏览器已关闭
+
+请选择操作:
+```
+
+</details>
 
 ## 🚀 快速开始
 

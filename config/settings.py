@@ -158,6 +158,9 @@ class AppConfig(BaseModel):
     autogen_max_turns: int = Field(
         default_factory=lambda: int(os.getenv("AUTOGEN_MAX_TURNS", "30"))
     )
+    autogen_reflect_on_tool_use: bool = Field(
+        default_factory=lambda: os.getenv("AUTOGEN_REFLECT_ON_TOOL_USE", "false").lower() == "true"
+    )
 
     def __init__(self, **data):
         super().__init__(**data)

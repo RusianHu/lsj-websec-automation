@@ -169,12 +169,23 @@ async def get_page_content() -> Dict[str, Any]:
     try:
         browser = await get_browser_manager()
         content = await browser.get_content()
-        
+
+        # 限制返回内容长度,避免 LLM 调用负载过大
+        max_length = 2000
+        is_truncated = len(content) > max_length
+        if is_truncated:
+            truncated = content[:max_length]
+            log.debug(f"页面内容超出 {max_length} 字符,已截断")
+        else:
+            truncated = content
+        message = "成功获取页面内容 (已截断)" if is_truncated else "成功获取页面内容"
+
         return {
             "success": True,
-            "content": content,
-            "length": len(content),
-            "message": "成功获取页面内容"
+            "content": truncated,
+            "length": len(truncated),
+            "truncated": is_truncated,
+            "message": message
         }
     except Exception as e:
         log.error(f"获取页面内容失败: {str(e)}")
@@ -892,4 +903,3 @@ async def test_form_with_payloads(
             "error": str(e),
             "message": "表单 payload 测试失败"
         }
-

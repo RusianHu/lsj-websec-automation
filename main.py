@@ -3,7 +3,9 @@ LSJ WebSec Automation - 主程序入口
 基于 Autogen + Playwright 的自动化渗透测试工具
 """
 import asyncio
-from typing import Optional
+import ast
+import json
+from typing import Any, Optional
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
@@ -72,6 +74,88 @@ from tools.report_generator import generate_html_report, generate_json_report
 console = Console()
 
 
+def _safe_parse_content(raw: Any) -> Any:
+    """尝试解析 JSON 或 Python 字面量,失败则返回原值"""
+    if not isinstance(raw, str):
+        return raw
+    try:
+        return json.loads(raw)
+    except (TypeError, json.JSONDecodeError):
+        try:
+            return ast.literal_eval(raw)
+        except (ValueError, SyntaxError):
+            return raw
+
+
+def _stringify_content(value: Any) -> str:
+    """将对象转为适合报告展示的字符串"""
+    if isinstance(value, (dict, list)):
+        try:
+            return json.dumps(value, ensure_ascii=False)
+        except TypeError:
+            return str(value)
+    return str(value)
+
+
+def extract_agent_summary(result: Any, agent_name: str) -> str:
+    """从 Agent 执行结果中提取可用于报告的文本摘要"""
+    if not result or not getattr(result, "messages", None):
+        return "未能从代理响应中提取总结，请查看日志或手动复核执行过程。"
+
+    summary_lines: list[str] = []
+
+    for msg in result.messages:
+        if getattr(msg, "source", "") != agent_name:
+            continue
+
+        message_chunks: list[str] = []
+        content = getattr(msg, "content", None)
+        if isinstance(content, str):
+            message_chunks.append(content)
+        elif isinstance(content, list):
+            for part in content:
+                if isinstance(part, str):
+                    message_chunks.append(part)
+                elif isinstance(part, dict):
+                    text_part = part.get("text")
+                    if text_part:
+                        message_chunks.append(str(text_part))
+
+        tool_calls = getattr(msg, "tool_calls", None)
+        results = getattr(msg, "results", None)
+        if tool_calls and results:
+            for call, result_item in zip(tool_calls, results):
+                call_name = getattr(call, "name", "unknown")
+                arguments = _safe_parse_content(getattr(call, "arguments", ""))
+                args_repr = _stringify_content(arguments)
+
+                result_content = _safe_parse_content(getattr(result_item, "content", ""))
+                result_repr = _stringify_content(result_content)
+
+                message_chunks.append(
+                    f"工具 {call_name} 调用参数: {args_repr}\n返回结果: {result_repr}"
+                )
+
+        merged = "\n".join(
+            chunk.strip()
+            for chunk in message_chunks
+            if isinstance(chunk, str) and chunk.strip()
+        )
+        merged = merged.replace("TERMINATE", "").strip()
+        if merged:
+            summary_lines.append(merged)
+
+    deduped_lines: list[str] = []
+    for line in summary_lines:
+        if not deduped_lines or deduped_lines[-1] != line:
+            deduped_lines.append(line)
+
+    summary = "\n\n".join(deduped_lines).strip()
+    if not summary:
+        summary = "未能从代理响应中提取总结，请查看日志或手动复核执行过程。"
+    return summary
+
+
 def print_banner():
     """打印欢迎横幅"""
     banner = """
@@ -134,24 +218,7 @@ async def run_web_scan(target_url: str):
         result = await scanner_agent.run(task)
         console.print("\n[green]扫描完成[/green]")
 
-        # 提取扫描结果文本（仅保留包含 TERMINATE 的最终总结，避免引入无关寒暄/反思内容）
-        contents: list[str] = []
-        for msg in result.messages:
-            if hasattr(msg, 'content') and isinstance(msg.content, str):
-                contents.append(msg.content)
-        final_text = None
-        for c in contents:
-            if "TERMINATE" in c:
-                final_text = c
-                break
-        if final_text is None and contents:
-            final_text = contents[-1]
-        if final_text:
-            # 去掉单独的 TERMINATE 行
-            lines = [ln for ln in final_text.splitlines() if "TERMINATE" not in ln.strip()]
-            scan_text = "\n".join(lines).strip()
-        else:
-            scan_text = ""
+        scan_text = extract_agent_summary(result, scanner_agent.name)
 
         # 构建报告数据
         from datetime import datetime
@@ -231,24 +298,7 @@ async def run_vulnerability_test(target_url: str):
         result = await analyst_agent.run(task)
         console.print("\n[green]漏洞测试完成[/green]")
 
-        # 提取测试结果文本（仅保留包含 TERMINATE 的最终总结，避免引入无关寒暄/反思内容）
-        contents: list[str] = []
-        for msg in result.messages:
-            if hasattr(msg, 'content') and isinstance(msg.content, str):
-                contents.append(msg.content)
-        final_text = None
-        for c in contents:
-            if "TERMINATE" in c:
-                final_text = c
-                break
-        if final_text is None and contents:
-            final_text = contents[-1]
-        if final_text:
-            # 去掉单独的 TERMINATE 行
-            lines = [ln for ln in final_text.splitlines() if "TERMINATE" not in ln.strip()]
-            test_text = "\n".join(lines).strip()
-        else:
-            test_text = ""
+        test_text = extract_agent_summary(result, analyst_agent.name)
 
         # 构建报告数据
         from datetime import datetime
@@ -381,24 +431,7 @@ async def run_browser_automation(target_url: str):
         result = await browser_agent.run(task)
         console.print("\n[green]浏览器自动化测试完成[/green]")
 
-        # 提取测试结果文本（仅保留包含 TERMINATE 的最终总结，避免引入无关寒暄/反思内容）
-        contents: list[str] = []
-        for msg in result.messages:
-            if hasattr(msg, 'content') and isinstance(msg.content, str):
-                contents.append(msg.content)
-        final_text = None
-        for c in contents:
-            if "TERMINATE" in c:
-                final_text = c
-                break
-        if final_text is None and contents:
-            final_text = contents[-1]
-        if final_text:
-            # 去掉单独的 TERMINATE 行
-            lines = [ln for ln in final_text.splitlines() if "TERMINATE" not in ln.strip()]
-            automation_text = "\n".join(lines).strip()
-        else:
-            automation_text = ""
+        automation_text = extract_agent_summary(result, browser_agent.name)
 
         # 构建报告数据
         from datetime import datetime
