@@ -134,11 +134,24 @@ async def run_web_scan(target_url: str):
         result = await scanner_agent.run(task)
         console.print("\n[green]扫描完成[/green]")
 
-        # 提取扫描结果文本
-        scan_text = ""
+        # 提取扫描结果文本（仅保留包含 TERMINATE 的最终总结，避免引入无关寒暄/反思内容）
+        contents: list[str] = []
         for msg in result.messages:
             if hasattr(msg, 'content') and isinstance(msg.content, str):
-                scan_text += msg.content + "\n\n"
+                contents.append(msg.content)
+        final_text = None
+        for c in contents:
+            if "TERMINATE" in c:
+                final_text = c
+                break
+        if final_text is None and contents:
+            final_text = contents[-1]
+        if final_text:
+            # 去掉单独的 TERMINATE 行
+            lines = [ln for ln in final_text.splitlines() if "TERMINATE" not in ln.strip()]
+            scan_text = "\n".join(lines).strip()
+        else:
+            scan_text = ""
 
         # 构建报告数据
         from datetime import datetime
@@ -368,11 +381,24 @@ async def run_browser_automation(target_url: str):
         result = await browser_agent.run(task)
         console.print("\n[green]浏览器自动化测试完成[/green]")
 
-        # 提取测试结果文本
-        automation_text = ""
+        # 提取测试结果文本（仅保留包含 TERMINATE 的最终总结，避免引入无关寒暄/反思内容）
+        contents: list[str] = []
         for msg in result.messages:
             if hasattr(msg, 'content') and isinstance(msg.content, str):
-                automation_text += msg.content + "\n\n"
+                contents.append(msg.content)
+        final_text = None
+        for c in contents:
+            if "TERMINATE" in c:
+                final_text = c
+                break
+        if final_text is None and contents:
+            final_text = contents[-1]
+        if final_text:
+            # 去掉单独的 TERMINATE 行
+            lines = [ln for ln in final_text.splitlines() if "TERMINATE" not in ln.strip()]
+            automation_text = "\n".join(lines).strip()
+        else:
+            automation_text = ""
 
         # 构建报告数据
         from datetime import datetime
